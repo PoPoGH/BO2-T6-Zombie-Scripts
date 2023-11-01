@@ -1,33 +1,36 @@
 init()
 {
-    // Initialize the script
-    level thread onPlayerConnect(); // Start the 'onPlayerConnect' thread
-    level thread checkForRound30(); // Start the 'checkForRound30' thread
+    level thread onPlayerConnect();
+    level thread checkForRound30();
 }
 
 onPlayerConnect()
 {
-    // Continuously wait for player connections
     for(;;)
     {
-        level waittill("connected", player); // Wait for a player to connect
+        level waittill("connected", player);
     }
 }
 
 checkForRound30()
 {
-    // Continuously check if the current round is greater than 30
     while(1)
     {
-        if(level.round_number > 30)
+        if(level.round_number > 30 && getDvar("g_password") == "")
         {
-            setDvar("g_password", "round30more"); // Set the server password to "round30more" when round is greater than 30
-            wait 60; // Wait for 60 seconds before checking again
+            setDvar("g_password", "yourpassword"); // Replace "yourpassword" with your desired password
+            iprintlnbold("^1Round 30 reached: Server is now locked for new connections.");
+            wait 60; // Wait 60 seconds before checking again
+        }
+        else if(level.round_number <= 30 && getDvar("g_password") != "")
+        {
+            setDvar("g_password", ""); // If the round is below 30 (in case you roll back rounds or restart), this will remove the password.
+            iprintlnbold("^2Server is now unlocked for new connections.");
+            wait 10; // Wait 10 seconds before checking again
         }
         else
         {
-            setDvar("g_password", ""); // If the round is less than or equal to 30, clear the server password
-            wait 10; // Wait for 10 seconds before checking again
+            wait 10; // If no changes are needed, wait 10 seconds before checking again.
         }
     }
 }
